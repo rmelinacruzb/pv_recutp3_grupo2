@@ -1,25 +1,45 @@
 import { useState } from "react";
 import proyectoServices from "../services/proyectoServices.js";
+import ProyectoCard from "./Proyectocard.jsx";
+import DetalleProyecto from "./Detalleproyecto.jsx";
 import "../css/Listaproyectos.css";
 
+const formInicial = {
+  titulo: "", categoria: "", estado: "", descripcion: "" ,   recursos: [{ tipo: "PDF", url: "", label: "" }],
+  equipo: [{ nombre: "", rol: "" }],
+};
+
 export const ListaProyectos = () => {
-
   const [proyectos, setProyectos] = useState(proyectoServices.obtenerProyectos());
+  const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
+  const [nuevoProyecto, setNuevoProyecto] = useState(formInicial);
+ 
+  const { titulo, categoria, estado, descripcion, recursos, equipo  } = nuevoProyecto;
 
-  const [nuevoProyecto, setNuevoProyecto] = useState({
-    titulo: "",
-    categoria: "",
-    estado: "",
-  });
+  const tieneRecurso = recursos.some(r => r.url.trim());
+  const tieneIntegrante = equipo.some(i => i.nombre.trim() && i.rol.trim());
 
-  const invalido =
-    !nuevoProyecto.titulo ||
-    !nuevoProyecto.categoria ||
-    !nuevoProyecto.estado;
+ const invalido = !titulo || !categoria || !estado || !tieneRecurso || !tieneIntegrante;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNuevoProyecto({ ...nuevoProyecto, [name]: value });
+  };
+  
+ const handleActualizar = (tipo, index, field, value) => {
+    const listaActualizada = nuevoProyecto[tipo].map((item, i) =>i === index ? { ...item, [field]: value } : item
+    );
+    setNuevoProyecto({ ...nuevoProyecto, [tipo]: listaActualizada });
+  };
+
+  const handleAgregarRI = (tipo, Vacio) => {
+    setNuevoProyecto({ ...nuevoProyecto, [tipo]: [...nuevoProyecto[tipo], Vacio] });
+  };
 
   const handleEliminar = (id) => {
     proyectoServices.eliminarProyecto(id);
     setProyectos(proyectoServices.obtenerProyectos());
+     if (proyectoSeleccionado?.id === id) setProyectoSeleccionado(null);
   };
 
   const handleBuscar = (e) => {
@@ -28,75 +48,112 @@ export const ListaProyectos = () => {
 
   const handleAgregar = (e) => {
     e.preventDefault();
-    proyectoServices.agregarProyecto(nuevoProyecto);
+    const proyectoCompleto = {
+      titulo, categoria, estado,
+      descripcion: descripcion,
+      recursos: recursos.filter(r => r.url.trim()),
+      equipo: equipo.filter(i => i.nombre.trim()),
+    };
+    proyectoServices.agregarProyecto(proyectoCompleto);
     setProyectos(proyectoServices.obtenerProyectos());
-    setNuevoProyecto({ titulo: "", categoria: "", estado: "" });
+    setNuevoProyecto(formInicial);
   };
 
   return (
     <>
-      <aside>
+      <aside className="seccion-busqueda">
         <label>
-          Buscar:
+          <span>Buscar:</span>
           <input type="text" placeholder="Buscar proyecto" onChange={handleBuscar} />
         </label>
       </aside>
 
+
       <main>
-    <form className="form-agregar" onSubmit={handleAgregar}>
-  <h2>Agregar Nuevo Proyecto</h2>
+       {proyectoSeleccionado ? (
+          <DetalleProyecto
+            proyecto={proyectoSeleccionado}
+            onVolver={() => setProyectoSeleccionado(null)}
+          />) : (
+            <>       
+       <form className="form-agregar" onSubmit={handleAgregar}>
+      <h2>Agregar Nuevo Proyecto</h2>
   
-  <input
-    name="titulo"
-    placeholder="Título"
-    value={nuevoProyecto.titulo}
-    onChange={(e) => setNuevoProyecto({ ...nuevoProyecto, titulo: e.target.value })}
-  />
+    <fieldset className="form-fieldset">
+        <input name="titulo" placeholder="Título del proyecto" value={titulo} onChange={handleChange} />
+        <div className="form-row">
+        <select name="categoria" value={categoria} onChange={handleChange}>
+        <option value="">-- Categoría --</option>
+        <option value="Taller">Taller</option>
+        <option value="Comedor">Comedor</option>
+        <option value="Curso">Curso</option>
+        <option value="Recaudacion">Recaudación</option>
+        </select>
+        <select name="estado" value={estado} onChange={handleChange}>
+        <option value="">-- Estado --</option>
+        <option value="En Proceso">En Proceso</option>
+        <option value="Finalizado">Finalizado</option>
+        </select>
+      </div>
+    </fieldset> 
 
-  <select
-    name="categoria"
-    value={nuevoProyecto.categoria}
-    onChange={(e) => setNuevoProyecto({ ...nuevoProyecto, categoria: e.target.value })}
-  >
-    <option value="">-- Categoría --</option>
-    <option value="Taller">Taller</option>
-    <option value="Comedor">Comedor</option>
-    <option value="Curso">Curso</option>
-    <option value="Recaudacion">Recaudación</option>
-  </select>
+    <fieldset className="form-fieldset">
+       <legend>Descripción</legend>
+       <textarea name="descripcion" placeholder="Descripcion" value={descripcion} onChange={handleChange} />
+    </fieldset>
 
-  <select
-    name="estado"
-    value={nuevoProyecto.estado}
-    onChange={(e) => setNuevoProyecto({ ...nuevoProyecto, estado: e.target.value })}
-  >
-    <option value="">-- Estado --</option>
-    <option value="En Proceso">En Proceso</option>
-    <option value="Finalizado">Finalizado</option>
-  </select>
+   <fieldset className="form-fieldset">
+      <legend>Recursos</legend>
+      {recursos.map((r, i) => (
+      <div className="form-dinamico" key={i}>
+      <select value={r.tipo} onChange={(e) =>
+      handleActualizar("recursos", i, "tipo", e.target.value)}>
+        <option value="PDF">PDF</option>
+        <option value="GitHub">GitHub</option> 
+        <option value="Drive">Drive</option>
+      </select>
+       <input placeholder="Nombre" value={r.label} onChange={(e) => handleActualizar("recursos", i, "label", e.target.value)} />
+       <input placeholder="URL" value={r.url} onChange={(e) => handleActualizar("recursos", i, "url", e.target.value)} />
+      </div>
+    ))}
+    <button type="button" className="btn-agregar-item" onClick={() => handleAgregarRI("recursos",  { tipo: "PDF", url: "", label: "" })}>
+      Agregar Recurso
+    </button>
+    </fieldset>
+   
+    <fieldset className="form-fieldset">
+      <legend>Equipo</legend>
+      {equipo.map((integrante, i) => (
+      <div className="form-dinamico" key={i}>
+       <input placeholder="Nombre" value={integrante.nombre} onChange={(e) =>  handleActualizar("equipo", i, "nombre", e.target.value)} />
+       <input placeholder="Rol" value={integrante.rol} onChange={(e) => handleActualizar("equipo", i, "url", e.target.value)} />
+      </div>
+    ))}
+    <button type="button" className="btn-agregar-item" onClick={() => handleAgregarRI("equipo", { nombre: "", rol: "" })}>
+      Agregar integrante
+    </button>
+  </fieldset>
+  
+   <button type="submit" disabled={invalido}>
+     Agregar Proyecto
+   </button>
+   </form>
+   
 
-  <button type="submit" disabled={invalido}>
-    Agregar Proyecto
-  </button>
-</form>
-
-        <div className="contenedor">
-          {proyectos.map((proyecto) => (
-            <div key={proyecto.id} className="card">
-              <h2>{proyecto.titulo}</h2>
-              <h3>{proyecto.categoria}</h3>
-              <span className={`estado-badge ${proyecto.estado === "Finalizado" ? "finalizado" : "en-proceso"}`}>
-                {proyecto.estado}
-              </span>
-              <div className="card-botones">
-                <button className="btn-borrar" onClick={() => handleEliminar(proyecto.id)}>
-                  Eliminar Proyecto
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+   <section className="contenedor">
+      {proyectos.map((proyecto) => (
+      <ProyectoCard
+       key={proyecto.id}
+       proyecto={proyecto}
+       onEliminar={handleEliminar}
+       onVerdetalle={(id) => setProyectoSeleccionado(proyectoServices.obtenerProyectoPorId(id))}/>
+        ))}
+     </section>
+     </>
+       )}
       </main>
     </>
   );
 };
+
+export default ListaProyectos;
