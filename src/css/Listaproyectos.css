@@ -12,16 +12,16 @@
 }
 
 .form-agregar h2 {
-  font-family: var(--fuente);
   color: var(--Negro);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
+.form-agregar textarea { resize: vertical; }
 .form-agregar input::placeholder {
-  color: var(--Negro);  
+  color: #888;  
 }
 .form-agregar input,
-.form-agregar select {
+.form-agregar select,.form-agregar textarea {
   padding: 10px 12px;
   border: 1px solid var(--Gris);
   border-radius: 8px;
@@ -30,18 +30,33 @@
   width: 100%;
 }
 
-.form-agregar label {
-  font-family: var(--fuente);
-  color: var(--Negro);
-  font-weight: 500;
+.form-fieldset {
+  border: 1px solid var(--Gris);
+  border-radius: 10px;
+  padding: 16px 20px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 10px;
 }
 
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.form-dinamico{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.form-dinamico input,
+.form-dinamico select { flex: 1; }
+
 .form-agregar button[type="submit"] {
   background-color: var(--Celeste);
-  color: white;
+  color: var(--Blanco);
   border: none;
   padding: 10px 24px;
   border-radius: 8px;
@@ -54,8 +69,7 @@
 }
 
 .form-agregar button[type="submit"]:hover {
-  background-color: var(--Gris);
-  color: var(--Negro);
+  background-color:var(--Negro);
 }
 
 .form-agregar button[type="submit"]:active {
@@ -63,10 +77,25 @@
 }
 
 .form-agregar button[type="submit"]:disabled {
-  background-color: var(--Celeste);
-  cursor: not-allowed;
-  transform: none;
+opacity: 0.5; 
+cursor: not-allowed
 }
+
+.btn-agregar-item {
+  background: none;
+  border: 1px dashed var(--Celeste);
+  border-radius: 8px;
+  color: var(--Celeste);
+  cursor: pointer;
+  padding: 8px;
+  font-family: var(--fuente);
+  font-size: 0.9rem;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.btn-agregar-item:hover { background-color: rgba(94,164,235,0.08); }
+
 
 .contenedor {
   display: flex;
@@ -97,7 +126,6 @@
 .card h2 {
   color: var(--Negro);
   font-size: 1.2rem;
-  font-family: var(--fuente);
   border-bottom: 2px solid var(--Celeste);
   padding-bottom: 8px;
 }
@@ -105,7 +133,6 @@
 .card h3 {
   color: var(--Negro);
   font-size: 1rem;
-  font-family: var(--fuente);
 }
 
 .estado-badge {
@@ -114,28 +141,25 @@
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: bold;
-  font-family: var(--fuente);
 }
 
 .estado-badge.finalizado {
-  background-color: #a16084;  /* ← rosa/magenta */
+  background-color: #a16084; 
   color: var(--Blanco);
 }
 
 .estado-badge.en-proceso {
-  background-color: var(--Celeste);  /* ← celeste */
+  background-color: var(--Celeste);
   color: var(--Blanco);
 }
 
-.card-botones {
+.card-actions {
   display: flex;
   gap: 10px;
   margin-top: 10px;
-  flex-wrap: wrap;
 }
 
-.btn-borrar {
-  background-color: rgb(200, 130, 100);
+.btn-detalle ,.btn-borrar {
   color: var(--Blanco);
   border: none;
   padding: 8px 16px;
@@ -144,12 +168,17 @@
   font-family: var(--fuente);
   font-weight: bold;
   transition: background-color 0.2s, transform 0.1s;
+  flex: 1;
 }
 
-.btn-borrar:hover {
-   background-color: var(--Fondo-Ladrillo);
-  }
+.btn-detalle { 
+  background-color: var(--Celeste); }
+.btn-detalle:hover { 
+  background-color: var(--Negro); }
 
-.btn-borrar:active {
-  transform: scale(0.95);
-}
+.btn-borrar { 
+  background-color: rgb(200,130,100); }
+.btn-borrar:hover { 
+  background-color: var(--base-filtros); }
+
+.btn-detalle:active, .btn-borrar:active { transform: scale(0.95); }

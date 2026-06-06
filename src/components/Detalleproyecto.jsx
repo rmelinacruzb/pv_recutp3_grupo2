@@ -26,7 +26,7 @@ const Detalleproyecto = ({ proyecto, onVolver }) => {
                <ul>
             {recursos.map((recurso, i) => (
               <li key={i}>
-                <a href={recurso.url} target="_blank" >
+                <a href= "#" >
                     {recurso.label} ({recurso.tipo})
                 </a>
               </li>
