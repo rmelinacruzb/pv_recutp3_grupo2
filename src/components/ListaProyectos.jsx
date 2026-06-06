@@ -1,7 +1,7 @@
 import { useState } from "react";
 import proyectoServices from "../services/proyectoServices.js";
 import ProyectoCard from "./Proyectocard.jsx";
-import DetalleProyecto from "./Detalleproyecto.jsx";
+import Detalleproyecto from "./Detalleproyecto.jsx";
 import "../css/Listaproyectos.css";
 
 const formInicial = {
@@ -71,7 +71,7 @@ export const ListaProyectos = () => {
 
       <main>
        {proyectoSeleccionado ? (
-          <DetalleProyecto
+          <Detalleproyecto
             proyecto={proyectoSeleccionado}
             onVolver={() => setProyectoSeleccionado(null)}
           />) : (
@@ -126,7 +126,7 @@ export const ListaProyectos = () => {
       {equipo.map((integrante, i) => (
       <div className="form-dinamico" key={i}>
        <input placeholder="Nombre" value={integrante.nombre} onChange={(e) =>  handleActualizar("equipo", i, "nombre", e.target.value)} />
-       <input placeholder="Rol" value={integrante.rol} onChange={(e) => handleActualizar("equipo", i, "url", e.target.value)} />
+       <input placeholder="Rol" value={integrante.rol} onChange={(e) => handleActualizar("equipo", i, "rol", e.target.value)} />
       </div>
     ))}
     <button type="button" className="btn-agregar-item" onClick={() => handleAgregarRI("equipo", { nombre: "", rol: "" })}>
@@ -155,5 +155,3 @@ export const ListaProyectos = () => {
     </>
   );
 };
-
-export default ListaProyectos;

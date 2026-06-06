@@ -84,7 +84,7 @@ const proyectoServices = (() => {
   const obtenerProyectos = () => [...proyectos];
 
  const obtenerProyectoPorId = (id) => {
-    return proyectos.find((p) => p.id === Numero(id));
+    return proyectos.find((p) => p.id === Number(id));
   };
 
   const agregarProyecto = (nuevoProyecto) => {
